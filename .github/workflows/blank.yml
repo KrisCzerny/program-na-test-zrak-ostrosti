@@ -1,0 +1,68 @@
+// program na test zrakové ostrosti
+//použité
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <vector>
+#include <iomanip>
+
+using namespace std;
+
+// Funkce pro generování náhodného písmene
+char generateRandomLetter() {
+    return 'A' + rand() % 26; // Generuje písmena od 'A' do 'Z'
+}
+
+// Funkce pro spuštění testu zrakové ostrosti
+void visionTest() {
+    srand(static_cast<unsigned int>(time(0))); // Inicializace generátoru náhodných čísel
+    int fontSize = 72; // Počáteční velikost písmen
+    int maxFontSize = fontSize; // Maximální velikost písmen
+    int correctAnswers = 0; // Počet správných odpovědí
+    int totalQuestions = 0; // Celkový počet otázek
+    vector<int> results; // Ukládá výsledky posledních řad
+ 
+    while (fontSize >= 12) { // Zmenšuje velikost písmen, dokud je nad 10
+        correctAnswers = 0;
+        totalQuestions = 0;
+        cout << "\nTest se začíná, velikost písmen: " << fontSize << "px" << endl;
+
+        for (int i = 0; i < 5; ++i) {
+            char letter = generateRandomLetter();
+            cout << "Jaké písmeno je to? (Písmeno bude zobrazeno na obrazovce - stiskněte Enter pro zobrazení): ";
+            cin.ignore(); // Čeká se na Enter
+            cout << "\033[1;" << fontSize << "m" << letter << "\033[0m" << endl; // Zobrazí písmeno v dané velikosti
+            char answer;
+            cout << "Zadejte písmeno: ";
+            cin >> answer;
+
+            if (toupper(answer) == letter) {
+                cout << "Správně!" << endl;
+                correctAnswers++;
+            } else {
+                cout << "Špatně! Správná odpověď byla: " << letter << endl;
+            }
+            totalQuestions++;
+        }
+
+        results.push_back(correctAnswers);
+        double percentage = (static_cast<double>(correctAnswers) / totalQuestions) * 100.0;
+        cout << "Správné odpovědi: " << correctAnswers << "/" << totalQuestions << " (" << fixed << setprecision(2) << percentage << "%)" << endl;
+
+        if (correctAnswers >= 3) { // 3 nebo více správných odpovědí
+            fontSize -= 10; // Zmenší velikost písmen
+        } else {
+            cout << "Méně než 50% správných odpovědí. Test končí." << endl;
+            break;
+        }
+    }
+
+    // Výpis maximálního dosaženého výsledku
+    cout << "\nMaximální dosažená velikost písmen: " << maxFontSize << "px" << endl;
+    cout << "Výsledky poslední řady 5 písmen: " << results.back() << "/5 (" << fixed << setprecision(2) << (static_cast<double>(results.back()) / 5.0 * 100.0) << "%)" << endl;
+}
+
+int main() {
+    visionTest();
+    return 0;
+}
